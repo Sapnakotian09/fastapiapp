@@ -44,6 +44,7 @@ def update_company(company_id: int, company: CompanyUpdate, db: Session = Depend
     return db_company
 
 
+
 @router.delete("/{company_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_company(company_id: int, db: Session = Depends(get_db)):
     db_company = db.query(Company).filter(Company.id == company_id).first()
