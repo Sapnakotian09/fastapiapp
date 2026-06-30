@@ -1,9 +1,8 @@
 function Footer() {
-    return(
-        <footer>
-            <p>All rights reserved by Talentspark.</p>
+    return (
+        <footer className="app-footer">
+            <p>© 2023 TalentSpark. All rights reserved.</p>
         </footer>
-    )
-    
+    );
 }
 export default Footer;

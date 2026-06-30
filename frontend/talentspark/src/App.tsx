@@ -1,48 +1,52 @@
+import './App.css';
 import Welcome from "./components/Welcome";
 import NavBar from "./components/NavBar";
-import Footer from "./components/Footer";
 import CompanyCard from "./components/CompanyCard";
 import JobCard from "./components/JobCard";
-import {useEffect ,useState } from "react";
-import {getCompanies} from "./Services/CompanyService";
-import type {company} from "./types/company"
+import Footer from "./components/Footer";
+import { useEffect, useState } from "react";
+import { getCompanies } from "./Services/CompanyService";
+import type { Company } from "./types/company";
 
-function App(){
-  const [loading,setLoading]=useState(true);
-  const[error,setError]=useState<Error | null>(null)
-  const[companies,setCompanies]=useState<Company[]>([]);
+function App() {
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [companies, setCompanies] = useState<Company[]>([]);
 
-  async function fetchCompanies(){
+  useEffect(() => {
+    void fetchCompanies();
+  }, []);
+
+  async function fetchCompanies() {
     setLoading(true);
-    try{
-      const companies=await getCompanies();
+
+    try {
+      const companies = await getCompanies();
       setCompanies(companies);
-    } catch (error) {
+    } catch (error: any) {
       setError(error);
     } finally {
       setLoading(false);
     }
+  }
 
-    
+  if (loading) {
+    return <div className="status">Loading...</div>;
   }
-  useEffect(()=>{
-    fetchCompanies();
-  },[]);
 
-  if(loading){
-    return <div>Loading...</div>
+  if (error) {
+    return <div className="status">Error: {error.message}</div>;
   }
-  if(error){
-    return <div>Error:{error.message}</div>
-  }
-  return(
-    <>
-    <NavBar/>
-    <welcome/>
-    <CompanyCard key={companies.id} companies={companies}/>
-    <JobCard/>
-    <Footer/>
-  </>
-  )
+
+  return (
+    <div id="center">
+      <NavBar />
+      <Welcome />
+      <JobCard />
+      {companies.length > 0 && <CompanyCard companies={companies} />}
+      <Footer />
+    </div>
+  );
 }
-export default App
+
+export default App;
