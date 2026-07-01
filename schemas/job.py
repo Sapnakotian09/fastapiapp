@@ -18,7 +18,7 @@ class JobUpdate(BaseModel):
 
 class JobResponse(JobBase):
     id: int
-    company_id:int
+    company_id: int
 
-    class config:
-        from_attributes = True
+    class Config:
+        orm_mode = True
