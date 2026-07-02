@@ -5,7 +5,7 @@ from urllib.parse import quote_plus
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-DB_TYPE = os.getenv("DB_TYPE", "sqlite").lower()
+DB_TYPE = os.getenv("DB_TYPE", "postgres").lower()
 DB_USER = os.getenv("DB_USER", "postgres")
 DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD", "sapna@12345"))
 DB_HOST = os.getenv("DB_HOST", "localhost")
