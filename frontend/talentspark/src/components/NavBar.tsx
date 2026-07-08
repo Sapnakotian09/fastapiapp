@@ -1,37 +1,26 @@
+import "./NavBar.css";
+
 type Props = {
-    activePage: "home" | "chat" | "companies" | "login" | "register";
-    isAuthenticated: boolean;
-    onShowHome: () => void;
-    onShowChat: () => void;
-    onShowCompanies: () => void;
-    onShowLogin: () => void;
-    onShowRegister: () => void;
-    onLogout: () => void;
-};
+    onLogout?: () => void;
+}
 
-function NavBar({ activePage, isAuthenticated, onShowHome, onShowChat, onShowCompanies, onShowLogin, onShowRegister, onLogout }: Props) {
+function NavBar({ onLogout }: Props) {
     return (
-        <nav className="app-nav">
-            <ul className="nav-list">
-                <li className={`nav-item ${activePage === "home" ? "active" : ""}`} onClick={onShowHome}>Home</li>
-                <li className={`nav-item ${activePage === "chat" ? "active" : ""}`} onClick={onShowChat}>Career Chat</li>
-                <li className={`nav-item ${activePage === "companies" ? "active" : ""}`} onClick={onShowCompanies}>Companies</li>
-                <li className={`nav-item ${activePage === "login" ? "active" : ""}`} onClick={onShowLogin}>Login</li>
-                <li className={`nav-item ${activePage === "register" ? "active" : ""}`} onClick={onShowRegister}>Register</li>
-            </ul>
-
-            <div className="nav-actions">
-                {!isAuthenticated ? (
-                    <>
-                        <button className="nav-button" type="button" onClick={onShowLogin}>Login</button>
-                        <button className="nav-button" type="button" onClick={onShowRegister}>Register</button>
-                    </>
-                ) : (
-                    <button className="nav-button" type="button" onClick={onLogout}>Logout</button>
+        <nav className="navbar">
+            <ul>
+                <li>Home</li>
+                <li>About</li>
+                <li>Contact</li>
+                {onLogout && (
+                    <li className="logout-item">
+                        <button className="logout-btn" onClick={onLogout}>
+                            Logout
+                        </button>
+                    </li>
                 )}
-            </div>
+            </ul>
         </nav>
-    );
+    )
 }
 
 export default NavBar;

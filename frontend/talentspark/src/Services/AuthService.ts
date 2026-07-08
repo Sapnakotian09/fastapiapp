@@ -1,20 +1,31 @@
-import type {LoginRequest,LoginResponse,RegisterRequest,RegisterResponse} from "../types/user";
+import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from "../types/user";
 import axios from "axios";
+
 const API_URL = "http://localhost:8000/auth";
 
-export const login = async (credentials:LoginRequest):Promise<LoginResponse>=>{
-    // Backend expects OAuth2PasswordRequestForm (form-encoded with "username" field)
+export const isLoggedIn = (): boolean => Boolean(localStorage.getItem("token"));
+
+export const logout = (): void => {
+    localStorage.removeItem("token");
+};
+
+export const login = async (credentials: LoginRequest): Promise<LoginResponse> => {
     const formData = new URLSearchParams();
     formData.append("username", credentials.email);
     formData.append("password", credentials.password);
 
     const response = await axios.post<LoginResponse>(`${API_URL}/login`, formData, {
-        headers: { "Content-Type": "application/x-www-form-urlencoded" }
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
     });
-    return response.data;
-}
 
-export const register = async (user:RegisterRequest):Promise<RegisterResponse>=>{
-    const response = await axios.post<RegisterResponse>(`${API_URL}/register`,user);
+    if (response.data?.access_token) {
+        localStorage.setItem("token", response.data.access_token);
+    }
+
     return response.data;
-}
+};
+
+export const register = async (user: RegisterRequest): Promise<RegisterResponse> => {
+    const response = await axios.post<RegisterResponse>(`${API_URL}/register`, user);
+    return response.data;
+};

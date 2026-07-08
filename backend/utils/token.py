@@ -8,8 +8,8 @@ from fastapi import Depends,HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 load_dotenv()
-SECRET_KEY=os.getenv("SECRET_KEY")
-ALGORITHM=os.getenv("ALGORITHM")
+SECRET_KEY=os.getenv("SECRET_KEY", "dev-secret-key")
+ALGORITHM=os.getenv("ALGORITHM", "HS256")
 
 def create_access_token(data:dict,expires_delta:timedelta=timedelta(hours=2)):
     to_encode=data.copy()

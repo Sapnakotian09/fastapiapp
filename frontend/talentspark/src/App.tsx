@@ -1,78 +1,136 @@
-import { useEffect, useState } from "react";
 import NavBar from "./components/NavBar";
-import ChatPage from "./pages/chat";
-import CompaniesPage from "./pages/companies";
+import CompanyCard from "./components/CompanyCard";
+import JobList from "./components/JobList";
+import ResumeAnalyzer from "./components/ResumeAnalyzer";
+import ChatBox from "./components/chatbox";
+import Footer from "./components/Footer";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import { useEffect, useState } from "react";
+import { getCompanies, updateCompany, deleteCompany, createCompany } from "./Services/CompanyService";
+import { isLoggedIn, logout } from "./Services/AuthService";
+import type { Company } from "./types/company";
 import "./App.css";
 
-type Page = "home" | "chat" | "companies" | "login" | "register";
-
 function App() {
-  const [page, setPage] = useState<Page>("home");
-  const [token, setToken] = useState<string>(() => localStorage.getItem("token") ?? "");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
+    const [companies, setCompanies] = useState<Company[]>([]);
+    const [authenticated, setAuthenticated] = useState(isLoggedIn());
+    const [showRegister, setShowRegister] = useState(false);
 
-  useEffect(() => {
-    if (token) {
-      localStorage.setItem("token", token);
-    } else {
-      localStorage.removeItem("token");
+    async function fetchCompanies() {
+        setLoading(true);
+        setError(null);
+        try {
+            const company = await getCompanies();
+            setCompanies(company);
+        } catch (err: any) {
+            if (err?.response?.status === 401) {
+                logout();
+                setAuthenticated(false);
+                setCompanies([]);
+                return;
+            }
+            setError(err as Error);
+        } finally {
+            setLoading(false);
+        }
     }
-  }, [token]);
 
-  const showHome = () => setPage("home");
-  const showChat = () => setPage("chat");
-  const showCompanies = () => setPage("companies");
-  const showLogin = () => setPage("login");
-  const showRegister = () => setPage("register");
+    async function handleEdit(company: Company) {
+        try {
+            const updatedCompany = await updateCompany(company.id, company);
+            setCompanies((prev) => prev.map((c) => c.id === updatedCompany.id ? updatedCompany : c));
+        } catch (err) {
+            setError(err as Error);
+        }
+    }
 
-  const handleLogin = (newToken: string) => {
-    setToken(newToken);
-    setPage("home");
-  };
+    async function handleDelete(id: number) {
+        try {
+            await deleteCompany(id);
+            setCompanies((prev) => prev.filter((c) => c.id !== id));
+        } catch (err) {
+            setError(err as Error);
+        }
+    }
 
-  const handleLogout = () => {
-    setToken("");
-    setPage("home");
-  };
+    async function handleAdd(company: Company) {
+        try {
+            const newCompany = await createCompany(company);
+            // Prepend the newly created company so it appears at the top like the screenshot
+            setCompanies((prev) => [newCompany, ...prev]);
+        } catch (err) {
+            setError(err as Error);
+        }
+    }
 
-  return (
-    <div className="app-shell">
-      <NavBar
-        activePage={page}
-        isAuthenticated={Boolean(token)}
-        onShowHome={showHome}
-        onShowChat={showChat}
-        onShowCompanies={showCompanies}
-        onShowLogin={showLogin}
-        onShowRegister={showRegister}
-        onLogout={handleLogout}
-      />
+    const handleLogin = () => {
+        setAuthenticated(true);
+        setShowRegister(false);
+        fetchCompanies();
+    }
 
-      <main className="page-container">
-        {page === "home" && (
-          <section className="hero">
-            <div className="hero-copy">
-              <h1>Welcome to TalentSpark</h1>
-              <p>Use the navigation above to chat, view companies, or log in.</p>
+    const handleLogout = () => {
+        logout();
+        setAuthenticated(false);
+        setCompanies([]);
+        setError(null);
+    }
+
+    useEffect(() => {
+        if (authenticated) {
+            fetchCompanies();
+        }
+    }, [authenticated]);
+
+    // Show login/register page if not authenticated
+    if (!authenticated) {
+        return (
+            <div className="auth-wrapper">
+                {showRegister ? (
+                    <Register onRegister={handleLogin} onSwitchToLogin={() => setShowRegister(false)} />
+                ) : (
+                    <Login onLogin={handleLogin} onSwitchToRegister={() => setShowRegister(true)} />
+                )}
             </div>
+        );
+    }
 
-            <div className="hero-card">
-              <span className="hero-role">Software Engineer</span>
-              <p>Google</p>
-              <p>Bangalore</p>
-              <p>5 LPA</p>
+    if (loading) {
+        return (
+            <div className="loading-state">
+                Loading...
             </div>
-          </section>
-        )}
+        );
+    }
 
-        {page === "chat" && <ChatPage />}
-        {page === "companies" && <CompaniesPage />}
-        {page === "login" && <Login onLogin={handleLogin} onSwitchToRegister={showRegister} />}
-        {page === "register" && <Register onSwitchToLogin={showLogin} />}
-      </main>
-    </div>
-  );
+    if (error) {
+        return (
+            <div className="error-state">
+                Error: {error.message}
+            </div>
+        );
+    }
+
+    return (
+        <div className="app-layout">
+            <NavBar onLogout={handleLogout} />
+            <main className="main-container">
+                <CompanyCard
+                    companies={companies}
+                    onedit={handleEdit}
+                    ondelete={handleDelete}
+                    onadd={handleAdd}
+                />
+                <JobList />
+                <ResumeAnalyzer />
+                <ChatBox />
+            </main>
+            <Footer />
+        </div>
+    );
 }
 
 export default App;

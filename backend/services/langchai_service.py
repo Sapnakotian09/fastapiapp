@@ -41,8 +41,51 @@ try:
         return getattr(response, "content", str(response))
 
 except ModuleNotFoundError:
-    def ask_career_chatbot_response(question: str, session_id: str = "default") -> str:
-        return f"[mock career reply] {question}"
+    try:
+        from services.llm_service import llm_response
+
+        def ask_career_chatbot_response(question: str, session_id: str = "default") -> str:
+            # Fallback to the simple LLM service (OpenAI) if available
+            try:
+                return llm_response(question)
+            except Exception:
+                return f"[mock career reply] {question}"
+    except Exception:
+        def ask_career_chatbot_response(question: str, session_id: str = "default") -> str:
+            # Simple rule-based fallback to provide useful career guidance
+            q = (question or "").strip().lower()
+            if not q:
+                return "Hi — what would you like to learn or ask about your career?"
+
+            # Learning intent
+            if any(k in q for k in ["learn", "learning", "want to learn", "how to learn"]):
+                return (
+                    "Great — tell me the specific skill or topic you want to learn. "
+                    "A good plan: 1) Define a clear goal, 2) Learn fundamentals from a beginner course or book, "
+                    "3) Build small projects, 4) Practice consistently and track progress. "
+                    "I can suggest resources if you tell me the topic (e.g., Python, React, data science)."
+                )
+
+            # Career path / job search intent
+            if any(k in q for k in ["job", "apply", "interview", "career", "hire"]):
+                return (
+                    "For job search: clarify your target role, tailor your resume to match job descriptions, "
+                    "practice common interview questions, prepare a small portfolio project, and network on LinkedIn. "
+                    "Tell me your target role and experience level and I can give a step-by-step plan."
+                )
+
+            # Skill improvement intent
+            if any(k in q for k in ["improve", "practice", "project", "portfolio"]):
+                return (
+                    "To improve skills, pick focused projects, get feedback (code review or mentor), "
+                    "and iterate. Break projects into weekly milestones and measure outcomes."
+                )
+
+            # Default helpful response
+            return (
+                "Thanks — I can help with learning plans, job search advice, and project ideas. "
+                "Please rephrase with more detail (topic, experience, or goal) so I can give actionable steps."
+            )
 
 except Exception as exc:
     def ask_career_chatbot_response(question: str, session_id: str = "default") -> str:

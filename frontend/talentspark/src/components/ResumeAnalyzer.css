@@ -1,0 +1,91 @@
+.resume-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+.resume-header h2 {
+    margin: 0 0 0.5rem;
+    color: var(--text-h);
+}
+
+.resume-header p {
+    margin: 0 0 1rem;
+    color: var(--text-muted);
+}
+
+.resume-input {
+    width: 100%;
+    min-height: 220px;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg);
+    color: var(--text);
+    resize: vertical;
+    margin-bottom: 1rem;
+    font-family: inherit;
+}
+
+.resume-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+}
+
+.analyze-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 999px;
+    padding: 0.85rem 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.analyze-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.resume-error {
+    color: var(--error);
+    margin-bottom: 1rem;
+}
+
+.resume-result {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1rem;
+    color: var(--text);
+}
+
+.resume-result h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+}
+
+.resume-analysis-text {
+    display: grid;
+    gap: 0.5rem;
+    line-height: 1.65;
+}
+
+.resume-analysis-text h4 {
+    margin: 1rem 0 0.5rem;
+    font-size: 1rem;
+    color: var(--text-h);
+}
+
+.resume-analysis-text p {
+    margin: 0;
+    color: var(--text);
+}
+
+.resume-analysis-text li {
+    margin-left: 1.2rem;
+    color: var(--text);
+}

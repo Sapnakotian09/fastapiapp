@@ -1,8 +1,11 @@
+import "./Footer.css";
+
 function Footer() {
     return (
-        <footer className="app-footer">
-            <p>© 2023 TalentSpark. All rights reserved.</p>
+        <footer className="footer">
+            <p>All rights reserved by Talentspark</p>
         </footer>
-    );
+    )
 }
+
 export default Footer;
