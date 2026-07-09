@@ -19,6 +19,15 @@ function App() {
     const [authenticated, setAuthenticated] = useState(isLoggedIn());
     const [showRegister, setShowRegister] = useState(false);
 
+    const handleAppError = (err: unknown) => {
+        if (err instanceof Error) {
+            setError(err);
+            return;
+        }
+
+        setError(new Error("An unexpected error occurred."));
+    };
+
     async function fetchCompanies() {
         setLoading(true);
         setError(null);
@@ -32,7 +41,7 @@ function App() {
                 setCompanies([]);
                 return;
             }
-            setError(err as Error);
+            handleAppError(err);
         } finally {
             setLoading(false);
         }
@@ -43,7 +52,7 @@ function App() {
             const updatedCompany = await updateCompany(company.id, company);
             setCompanies((prev) => prev.map((c) => c.id === updatedCompany.id ? updatedCompany : c));
         } catch (err) {
-            setError(err as Error);
+            handleAppError(err);
         }
     }
 
@@ -52,7 +61,7 @@ function App() {
             await deleteCompany(id);
             setCompanies((prev) => prev.filter((c) => c.id !== id));
         } catch (err) {
-            setError(err as Error);
+            handleAppError(err);
         }
     }
 
@@ -62,7 +71,7 @@ function App() {
             // Prepend the newly created company so it appears at the top like the screenshot
             setCompanies((prev) => [newCompany, ...prev]);
         } catch (err) {
-            setError(err as Error);
+            handleAppError(err);
         }
     }
 
